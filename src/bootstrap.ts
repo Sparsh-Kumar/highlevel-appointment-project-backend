@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import App from './app';
+
+import './healthcheck/healthcheck.controller';
+
 import { ApplicationOptions, MorganLoggingTypes } from './helpers/types';
 
 export default function bootstrap(): void {
@@ -15,3 +18,5 @@ export default function bootstrap(): void {
   /* eslint-disable no-new */
   new App(applicationOpts);
 }
+
+bootstrap();

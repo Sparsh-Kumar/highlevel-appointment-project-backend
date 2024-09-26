@@ -11,6 +11,7 @@ import AppointmentModal from './database/schemas/appointment.schema';
 import HttpException from './exceptions/http-exception-handler';
 import ValidationException from './exceptions/validation-exception-handler';
 import NotFoundException from './exceptions/not-found-exception-handler';
+import HealthCheckService from './healthcheck/healthcheck.service';
 
 export default class App extends Application {
   private _db: DbService;
@@ -19,6 +20,7 @@ export default class App extends Application {
     this._container.bind(DbService).toSelf();
     this._container.bind(DoctorModal).toSelf();
     this._container.bind(AppointmentModal).toSelf();
+    this._container.bind(HealthCheckService).toSelf();
   }
 
   setup(options: ApplicationOptions): void {
