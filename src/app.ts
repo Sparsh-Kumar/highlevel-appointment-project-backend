@@ -8,10 +8,11 @@ import BaseHttpResponse from './helpers/base-http-response';
 import { ApplicationOptions } from './helpers/types';
 import DoctorModal from './database/schemas/doctor.schema';
 import AppointmentModal from './database/schemas/appointment.schema';
-import HttpException from './exceptions/http-exception-handler';
 import ValidationException from './exceptions/validation-exception-handler';
 import NotFoundException from './exceptions/not-found-exception-handler';
 import HealthCheckService from './healthcheck/healthcheck.service';
+import DoctorService from './doctor/doctor.service';
+import DoctorRepository from './doctor/doctor.repository';
 
 export default class App extends Application {
   private _db: DbService;
@@ -21,6 +22,8 @@ export default class App extends Application {
     this._container.bind(DoctorModal).toSelf();
     this._container.bind(AppointmentModal).toSelf();
     this._container.bind(HealthCheckService).toSelf();
+    this._container.bind(DoctorService).toSelf();
+    this._container.bind(DoctorRepository).toSelf();
   }
 
   setup(options: ApplicationOptions): void {
@@ -35,7 +38,7 @@ export default class App extends Application {
     });
     server.setErrorConfig((app) => {
       app.use((
-        _err: HttpException | ValidationException | Error,
+        _err: ValidationException | Error,
         _req: Request,
         _res: Response,
         _next: NextFunction,

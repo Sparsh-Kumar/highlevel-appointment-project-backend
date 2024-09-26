@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import App from './app';
 
 import './healthcheck/healthcheck.controller';
+import './doctor/doctor.controller';
 
 import { ApplicationOptions, MorganLoggingTypes } from './helpers/types';
 
