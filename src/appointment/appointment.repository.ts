@@ -38,37 +38,37 @@ export default class AppointmentRepository {
     const conditionOne: QueryFieldFilterConstraint[] = [];
     conditionOne.push(where('doctorId', '==', createAppointmentDto.doctorId));
     conditionOne.push(where('appointmentDate', '==', new Date(createAppointmentDto.appointmentDate)));
-    conditionOne.push(where('appointmentStartTime', '>', appointmentStartingTime));
-    conditionOne.push(where('appointmentStartTime', '<', appointmentEndingTime));
-    conditionOne.push(where('appointmentEndTime', '>', appointmentStartingTime));
-    conditionOne.push(where('appointmentEndTime', '<', appointmentEndingTime));
+    conditionOne.push(where('appointmentStartTime', '>=', appointmentStartingTime));
+    conditionOne.push(where('appointmentStartTime', '<=', appointmentEndingTime));
+    conditionOne.push(where('appointmentEndTime', '>=', appointmentStartingTime));
+    conditionOne.push(where('appointmentEndTime', '<=', appointmentEndingTime));
 
     // snapshot 2
     const conditionTwo: QueryFieldFilterConstraint[] = [];
     conditionTwo.push(where('doctorId', '==', createAppointmentDto.doctorId));
     conditionTwo.push(where('appointmentDate', '==', new Date(createAppointmentDto.appointmentDate)));
-    conditionTwo.push(where('appointmentStartTime', '<', appointmentStartingTime));
-    conditionTwo.push(where('appointmentEndTime', '>', appointmentStartingTime));
-    conditionTwo.push(where('appointmentStartTime', '<', appointmentEndingTime));
-    conditionTwo.push(where('appointmentEndTime', '<', appointmentEndingTime));
+    conditionTwo.push(where('appointmentStartTime', '<=', appointmentStartingTime));
+    conditionTwo.push(where('appointmentEndTime', '>=', appointmentStartingTime));
+    conditionTwo.push(where('appointmentStartTime', '<=', appointmentEndingTime));
+    conditionTwo.push(where('appointmentEndTime', '<=', appointmentEndingTime));
 
     // snapshot 3
     const conditionThree: QueryFieldFilterConstraint[] = [];
     conditionThree.push(where('doctorId', '==', createAppointmentDto.doctorId));
     conditionThree.push(where('appointmentDate', '==', new Date(createAppointmentDto.appointmentDate)));
-    conditionThree.push(where('appointmentStartTime', '>', appointmentStartingTime));
-    conditionThree.push(where('appointmentStartTime', '<', appointmentEndingTime));
-    conditionThree.push(where('appointmentEndTime', '>', appointmentStartingTime));
-    conditionThree.push(where('appointmentEndTime', '>', appointmentEndingTime));
+    conditionThree.push(where('appointmentStartTime', '>=', appointmentStartingTime));
+    conditionThree.push(where('appointmentStartTime', '<=', appointmentEndingTime));
+    conditionThree.push(where('appointmentEndTime', '>=', appointmentStartingTime));
+    conditionThree.push(where('appointmentEndTime', '>=', appointmentEndingTime));
 
     // snapshot 4
     const conditionFour: QueryFieldFilterConstraint[] = [];
     conditionFour.push(where('doctorId', '==', createAppointmentDto.doctorId));
     conditionFour.push(where('appointmentDate', '==', new Date(createAppointmentDto.appointmentDate)));
-    conditionFour.push(where('appointmentStartTime', '<', appointmentStartingTime));
-    conditionFour.push(where('appointmentStartTime', '<', appointmentEndingTime));
-    conditionFour.push(where('appointmentEndTime', '>', appointmentStartingTime));
-    conditionFour.push(where('appointmentEndTime', '>', appointmentEndingTime));
+    conditionFour.push(where('appointmentStartTime', '<=', appointmentStartingTime));
+    conditionFour.push(where('appointmentStartTime', '<=', appointmentEndingTime));
+    conditionFour.push(where('appointmentEndTime', '>=', appointmentStartingTime));
+    conditionFour.push(where('appointmentEndTime', '>=', appointmentEndingTime));
 
     const firstSnapShot: Promise<QuerySnapshot<Appointment, DocumentData>> = getDocs(
       query(this._dbContext.appointments, ...conditionOne),
