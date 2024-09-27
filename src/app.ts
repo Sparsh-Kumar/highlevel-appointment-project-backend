@@ -62,7 +62,7 @@ export default class App extends Application {
     });
     const app = server.build();
     app.listen(process.env.PORT, () => {
-      console.log(process.env.WEB_APP_HOST);
+      console.log(`http://${process.env.WEB_APP_HOST}:${process.env.PORT}`);
     });
   }
 }
