@@ -11,6 +11,7 @@ import {
   DocumentSnapshot,
   addDoc,
   QueryFieldFilterConstraint,
+  deleteDoc,
 } from 'firebase/firestore';
 import { Doctor } from '../database/types';
 import { LooseObject } from '../helpers/types';
@@ -45,6 +46,11 @@ export default class DoctorRepository {
     const docRef = doc(this._dbContext.doctors, id);
     const docSnap: DocumentSnapshot<Doctor> = await getDoc(docRef);
     return docSnap.exists() ? (docSnap.data()) : null;
+  }
+
+  async findByIdAndRemove(id: string): Promise<void> {
+    const docRef = doc(this._dbContext.doctors, id);
+    await deleteDoc(docRef);
   }
 
   async create(createDoctorDto: CreateDoctorDto): Promise<Doctor | null> {
