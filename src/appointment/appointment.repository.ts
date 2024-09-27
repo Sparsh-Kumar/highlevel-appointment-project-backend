@@ -27,21 +27,6 @@ export default class AppointmentRepository {
     return docSnap.exists() ? (docSnap.data()) : null;
   }
 
-  async findByDate(createAppointmentDto: CreateAppointmentDto): Promise<Appointment[]> {
-    const appointments: Appointment[] = [];
-    const conditionOne: QueryFieldFilterConstraint[] = [];
-    console.log(createAppointmentDto);
-    conditionOne.push(where('doctorId', '==', createAppointmentDto.doctorId));
-    conditionOne.push(where('appointmentDate', '==', new Date(createAppointmentDto.appointmentDate)));
-    const firstSnapShot: QuerySnapshot<Appointment, DocumentData> = await getDocs(
-      query(this._dbContext.appointments, ...conditionOne),
-    );
-    firstSnapShot.forEach((document: QueryDocumentSnapshot<Appointment, DocumentData>) => {
-      appointments.push(document.data());
-    });
-    return appointments;
-  }
-
   async findConflictingAppointments(
     createAppointmentDto: CreateAppointmentDto,
     appointmentStartingTime: Date,
