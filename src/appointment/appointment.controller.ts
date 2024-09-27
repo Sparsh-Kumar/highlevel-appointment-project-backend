@@ -27,7 +27,7 @@ export default class AppointmentController {
   }
 
   @httpGet('/')
-  async findAll(
+  async getAllAppointments(
     _req: Request,
     _res: Response,
   ): Promise<Response> {
