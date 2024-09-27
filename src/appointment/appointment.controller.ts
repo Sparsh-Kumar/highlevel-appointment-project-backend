@@ -6,6 +6,7 @@ import {
 } from 'inversify-express-utils';
 import { Appointment } from 'src/database/types';
 import ValidateRequestMiddleware from 'src/middlewares/validate-request-body-middleware';
+import { LooseObject } from 'src/helpers/types';
 import BaseHttpResponse from '../helpers/base-http-response';
 import AppointmentService from './appointment.service';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
@@ -36,6 +37,16 @@ export default class AppointmentController {
       appointmentEndDate: _req.query.endDate,
     });
     const response: BaseHttpResponse = BaseHttpResponse.success(appointments, 200);
+    return _res.status(response.statusCode).send(response);
+  }
+
+  @httpGet('/slots/:date')
+  async getFreeSlots(
+    _req: Request,
+    _res: Response,
+  ): Promise<Response> {
+    const slots: LooseObject[] = await this._appointmentService.freeSlots(_req.params.date);
+    const response: BaseHttpResponse = BaseHttpResponse.success(slots, 200);
     return _res.status(response.statusCode).send(response);
   }
 }

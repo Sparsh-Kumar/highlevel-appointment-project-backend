@@ -49,7 +49,8 @@ export default class CreateAppointmentDto {
         .required(),
       notes: Joi.string()
         .max(500)
-        .optional(),
+        .optional()
+        .default(''),
     });
 
     const {

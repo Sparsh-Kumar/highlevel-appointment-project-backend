@@ -7,6 +7,7 @@ import CreateAppointmentDto from './dtos/create-appointment.dto';
 import DoctorService from '../doctor/doctor.service';
 import NotFoundException from '../exceptions/not-found-exception-handler';
 import ValidationException from '../exceptions/validation-exception-handler';
+import { SlotInformation } from './types';
 
 @injectable()
 export default class AppointmentService {
@@ -42,5 +43,56 @@ export default class AppointmentService {
     const appointmentEndDate = <string>(filter?.appointmentEndDate);
     if (appointmentStartDate && appointmentEndDate && (moment(appointmentEndDate).isBefore(moment(appointmentStartDate)))) throw new ValidationException('Appointment end date should be more than start date.');
     return this._appointmentRepository.findAll(filter);
+  }
+
+  async freeSlots(date: string, intervalMinutes = 30): Promise<SlotInformation[]> {
+    const doctorDayStart = moment(`${date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
+    const doctorDayEnd = moment(`${date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
+    let tempStartDate = doctorDayStart.clone();
+    const defaultAvailableSlots: SlotInformation[] = [];
+    while (tempStartDate < doctorDayEnd) {
+      const slotStartingTime = tempStartDate.clone();
+      const slotEndingTime = slotStartingTime.add(intervalMinutes, 'minutes');
+      defaultAvailableSlots.push({
+        slotStartingTime: tempStartDate,
+        slotEndingTime,
+      });
+      tempStartDate = slotEndingTime;
+    }
+    const availableAppointments: Appointment[] = await this.findAll({
+      appointmentStartDate: date,
+      appointmentEndDate: date,
+    });
+    availableAppointments.sort(
+      (a, b) => moment(a.appointmentStartTime).diff(moment(b.appointmentStartTime)),
+    );
+    let slots: SlotInformation[] = defaultAvailableSlots.filter((slot: SlotInformation) => {
+      let shouldExcluded = false;
+      for (let i = 0; i < availableAppointments?.length; i += 1) {
+        const record = availableAppointments[i];
+        const appointmentStart = moment(record.appointmentStartTime);
+        const appointmentEnd = moment(record.appointmentEndTime);
+        if (
+          (
+            appointmentStart.isAfter(slot.slotStartingTime)
+            && appointmentStart.isBefore(slot.slotEndingTime)
+          )
+          || (
+            appointmentEnd.isAfter(slot.slotStartingTime)
+            && appointmentEnd.isBefore(slot.slotEndingTime)
+          )
+          || (appointmentStart.isSame(slot.slotStartingTime))
+        ) {
+          shouldExcluded = true;
+          break;
+        }
+      }
+      return !shouldExcluded;
+    });
+    slots = slots.map((slot) => ({
+      slotStartingTime: moment(slot.slotStartingTime).format('YYYY-MM-DD HH:mm'),
+      slotEndingTime: moment(slot.slotEndingTime).format('YYYY-MM-DD HH:mm'),
+    }));
+    return slots;
   }
 }

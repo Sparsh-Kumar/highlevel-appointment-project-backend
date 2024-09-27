@@ -147,6 +147,12 @@ export default class AppointmentRepository {
     docSnap.forEach((document: QueryDocumentSnapshot<Appointment, DocumentData>) => {
       appointments.push(document.data());
     });
+    appointments.forEach((record: LooseObject) => {
+      /* eslint-disable no-param-reassign */
+      record.appointmentDate = moment.unix(<number>record.appointmentDate.seconds).format('YYYY-MM-DD');
+      record.appointmentStartTime = moment.unix(<number>record.appointmentStartTime.seconds).format('YYYY-MM-DD HH:mm');
+      record.appointmentEndTime = moment.unix(<number>record.appointmentEndTime.seconds).format('YYYY-MM-DD HH:mm');
+    });
     return appointments;
   }
 }
