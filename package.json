@@ -1,5 +1,5 @@
 {
-  "name": "highlevel-appointment-project",
+  "name": "highlevel-appointment-project-backend",
   "version": "1.0.0",
   "description": "Application for creating and getting appointments.",
   "main": "index.js",
