@@ -1,3 +1,5 @@
+import Joi from 'joi';
+import { uuid as uuidv4 } from 'uuidv4';
 import { Doctor } from '../../database/types';
 import ValidationException from '../../exceptions/validation-exception-handler';
 
@@ -15,16 +17,33 @@ export default class CreateDoctorDto {
   }
 
   static from(reqBody: Partial<Doctor>): CreateDoctorDto | never {
-    if (!reqBody.name) {
-      throw new ValidationException('Missing property employee name');
-    }
-    if (!reqBody.email) {
-      throw new ValidationException('Missing property email address.');
+    const createDoctorSchema = Joi.object({
+      _id: Joi.string()
+        .guid({ version: 'uuidv4' })
+        .default(uuidv4),
+      name: Joi.string()
+        .min(3)
+        .max(50)
+        .required(),
+      email: Joi.string()
+        .email()
+        .required(),
+    });
+
+    const {
+      error,
+      value,
+    } = <{
+      error: Joi.ValidationError,
+      value: Doctor
+    }>createDoctorSchema.validate(reqBody);
+    if (error) {
+      throw new ValidationException(`Validation error: ${error.message}`);
     }
 
     return new CreateDoctorDto(
-      reqBody.name,
-      reqBody.email,
+      value.name,
+      value.email,
     );
   }
 }
