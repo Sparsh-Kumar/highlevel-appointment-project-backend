@@ -4,8 +4,8 @@ import {
   httpGet,
   httpPost,
 } from 'inversify-express-utils';
-import BaseHttpResponse from 'src/helpers/base-http-response';
-import ValidateRequestMiddleware from 'src/middlewares/validate-request-body-middleware';
+import BaseHttpResponse from '../helpers/base-http-response';
+import ValidateRequestMiddleware from '../middlewares/validate-request-body-middleware';
 import { Doctor } from '../database/types';
 import DoctorService from './doctor.service';
 import CreateDoctorDto from './dtos/create-doctor.dto';
@@ -35,7 +35,7 @@ export default class DoctorController {
   }
 
   @httpPost('/', ValidateRequestMiddleware.with(CreateDoctorDto))
-  async createNewEmployee(
+  async createNewDoctor(
     _req: Request,
     _res: Response,
   ): Promise<Response> {

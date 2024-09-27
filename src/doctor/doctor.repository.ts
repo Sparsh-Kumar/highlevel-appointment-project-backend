@@ -12,7 +12,6 @@ import {
   addDoc,
   QueryFieldFilterConstraint,
 } from 'firebase/firestore';
-import { uuid } from 'uuidv4';
 import { Doctor } from '../database/types';
 import { LooseObject } from '../helpers/types';
 import DbService from '../database/db.service';
@@ -50,7 +49,6 @@ export default class DoctorRepository {
 
   async create(createDoctorDto: CreateDoctorDto): Promise<Doctor | null> {
     const doctorData = {
-      _id: uuid(),
       name: createDoctorDto.name,
       email: createDoctorDto.email,
     };

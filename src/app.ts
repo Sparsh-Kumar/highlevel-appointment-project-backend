@@ -6,24 +6,24 @@ import DbService from './database/db.service';
 import Application from './helpers/abstract-application';
 import BaseHttpResponse from './helpers/base-http-response';
 import { ApplicationOptions } from './helpers/types';
-import DoctorModal from './database/schemas/doctor.schema';
-import AppointmentModal from './database/schemas/appointment.schema';
 import ValidationException from './exceptions/validation-exception-handler';
 import NotFoundException from './exceptions/not-found-exception-handler';
 import HealthCheckService from './healthcheck/healthcheck.service';
 import DoctorService from './doctor/doctor.service';
 import DoctorRepository from './doctor/doctor.repository';
+import AppointmentService from './appointment/appointment.service';
+import AppointmentRepository from './appointment/appointment.repository';
 
 export default class App extends Application {
   private _db: DbService;
 
   configureService(): void {
     this._container.bind(DbService).toSelf();
-    this._container.bind(DoctorModal).toSelf();
-    this._container.bind(AppointmentModal).toSelf();
     this._container.bind(HealthCheckService).toSelf();
     this._container.bind(DoctorService).toSelf();
     this._container.bind(DoctorRepository).toSelf();
+    this._container.bind(AppointmentService).toSelf();
+    this._container.bind(AppointmentRepository).toSelf();
   }
 
   setup(options: ApplicationOptions): void {

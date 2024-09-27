@@ -1,6 +1,5 @@
 import Joi from 'joi';
-import { uuid as uuidv4 } from 'uuidv4';
-import { Doctor } from '../../database/types';
+import { DoctorJoiInterface } from '../../database/types';
 import ValidationException from '../../exceptions/validation-exception-handler';
 
 export default class CreateDoctorDto {
@@ -16,11 +15,8 @@ export default class CreateDoctorDto {
     this.email = email;
   }
 
-  static from(reqBody: Partial<Doctor>): CreateDoctorDto | never {
+  static from(reqBody: Partial<DoctorJoiInterface>): CreateDoctorDto | never {
     const createDoctorSchema = Joi.object({
-      _id: Joi.string()
-        .guid({ version: 'uuidv4' })
-        .default(uuidv4),
       name: Joi.string()
         .min(3)
         .max(50)
@@ -35,7 +31,7 @@ export default class CreateDoctorDto {
       value,
     } = <{
       error: Joi.ValidationError,
-      value: Doctor
+      value: DoctorJoiInterface
     }>createDoctorSchema.validate(reqBody);
     if (error) {
       throw new ValidationException(`Validation error: ${error.message}`);
