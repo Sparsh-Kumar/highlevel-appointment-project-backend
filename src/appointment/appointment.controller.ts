@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
   controller,
+  httpGet,
   httpPost,
 } from 'inversify-express-utils';
 import { Appointment } from 'src/database/types';
@@ -22,6 +23,19 @@ export default class AppointmentController {
       _req.body as CreateAppointmentDto,
     );
     const response: BaseHttpResponse = BaseHttpResponse.success(appointment, 201);
+    return _res.status(response.statusCode).send(response);
+  }
+
+  @httpGet('/')
+  async findAll(
+    _req: Request,
+    _res: Response,
+  ): Promise<Response> {
+    const appointments: Appointment[] = await this._appointmentService.findAll({
+      appointmentStartDate: _req.query.startDate,
+      appointmentEndDate: _req.query.endDate,
+    });
+    const response: BaseHttpResponse = BaseHttpResponse.success(appointments, 200);
     return _res.status(response.statusCode).send(response);
   }
 }

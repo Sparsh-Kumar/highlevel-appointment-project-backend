@@ -13,6 +13,7 @@ import {
   getDoc,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
+import { LooseObject } from 'src/helpers/types';
 import DbService from '../database/db.service';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
 import { Appointment } from '../database/types';
@@ -127,5 +128,25 @@ export default class AppointmentRepository {
     const documentRef = await addDoc(this._dbContext.appointments, appointmentData);
     const createdDocument = this.findById(documentRef.id);
     return createdDocument;
+  }
+
+  async findAll(
+    filter: LooseObject = {},
+  ): Promise<Appointment[]> {
+    const appointments: Appointment[] = [];
+    const conditions: QueryFieldFilterConstraint[] = [];
+    if (filter?.appointmentStartDate && typeof filter?.appointmentStartDate === 'string') {
+      conditions.push(where('appointmentDate', '>=', new Date(filter?.appointmentStartDate)));
+    }
+    if (filter?.appointmentEndDate && typeof filter?.appointmentEndDate === 'string') {
+      conditions.push(where('appointmentDate', '<=', new Date(filter?.appointmentEndDate)));
+    }
+    const docSnap: QuerySnapshot<Appointment, DocumentData> = await getDocs(
+      query(this._dbContext.appointments, ...conditions),
+    );
+    docSnap.forEach((document: QueryDocumentSnapshot<Appointment, DocumentData>) => {
+      appointments.push(document.data());
+    });
+    return appointments;
   }
 }

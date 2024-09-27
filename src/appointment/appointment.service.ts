@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { injectable } from 'inversify';
+import { LooseObject } from 'src/helpers/types';
 import { Appointment } from '../database/types';
 import AppointmentRepository from './appointment.repository';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
@@ -34,5 +35,12 @@ export default class AppointmentService {
 
     if (conflictingAppointments?.length) throw new ValidationException('Your appointment with the doctor is conflicting with other appointments.');
     return this._appointmentRepository.create(createAppointmentDto);
+  }
+
+  async findAll(filter: LooseObject = {}): Promise<Appointment[]> {
+    const appointmentStartDate = <string>(filter?.appointmentStartDate);
+    const appointmentEndDate = <string>(filter?.appointmentEndDate);
+    if (appointmentStartDate && appointmentEndDate && (moment(appointmentEndDate).isBefore(moment(appointmentStartDate)))) throw new ValidationException('Appointment end date should be more than start date.');
+    return this._appointmentRepository.findAll(filter);
   }
 }
