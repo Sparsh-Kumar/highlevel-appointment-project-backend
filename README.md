@@ -19,7 +19,7 @@ To get started with project, you can follow these steps:
 5. Install dependencies using `npm install`
 6. Create a `.env` file in the root directory of the project.
 7. Copy the contents of `.env.sample` and place them in `.env` file. Set the value of appropriate credentials.
-8. Start the API server in the development mode using `npm run devstart`
+8. Start the API server in the development mode using `npm run start:dev`
 
 ## Test Cases
 1. Test cases are mentioned in an elaborative way [here](https://docs.google.com/spreadsheets/d/1t7g3VRN-glGiNbz4dMz4FS_IU2uS_rGtb6otxUvjXVs/edit?gid=0#gid=0)
