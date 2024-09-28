@@ -1,4 +1,5 @@
 import moment from 'moment';
+import * as mz from 'moment-timezone';
 import { injectable } from 'inversify';
 import { LooseObject } from '../helpers/types';
 import { Appointment } from '../database/types';
@@ -20,11 +21,23 @@ export default class AppointmentService {
     const isDoctorExists = await this._doctorService.findById(createAppointmentDto.doctorId);
     if (!isDoctorExists) throw new NotFoundException(`Doctor with given Id = ${createAppointmentDto.doctorId} not found`);
 
-    const appointmentStartingTime = moment(`${createAppointmentDto.appointmentDate} ${createAppointmentDto.appointmentStartTime}`, 'YYYY-MM-DD HH:mm');
-    const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
+    // Getting the appointmentStartingTime & appointmentEndingTime
+    // according to timeZone provided in request body.
+    const appointmentStartingFormatted = `${createAppointmentDto.appointmentDate} ${createAppointmentDto.appointmentStartTime}`;
+    const appointmentStartingTimeAcqToTz = mz.tz(
+      appointmentStartingFormatted,
+      createAppointmentDto.timeZone,
+    );
 
-    const doctorDayStart = moment(`${createAppointmentDto.appointmentDate} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
-    const doctorDayEnd = moment(`${createAppointmentDto.appointmentDate} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
+    // Now converting the time into the APPLICATION_TIMEZONE
+    const convertedStartingTimeAcqToAppTz = appointmentStartingTimeAcqToTz.clone().tz(
+      process.env.APPLICATION_TIMEZONE
+    );
+    const appointmentStartingTime = moment(convertedStartingTimeAcqToAppTz, 'YYYY-MM-DD HH:mm');
+    const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
+    const dateOfAppointmentAfterTimezoneConversion = appointmentStartingTime.format('YYYY-MM-DD');
+    const doctorDayStart = moment(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm', process.env.APPLICATION_TIMEZONE);
+    const doctorDayEnd = moment(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm', process.env.APPLICATION_TIMEZONE);
 
     if (appointmentStartingTime.isBefore(doctorDayStart) || appointmentEndingTime.isAfter(doctorDayEnd)) throw new ValidationException('The appointment should be set in the availability time of the doctor.');
 
@@ -34,8 +47,19 @@ export default class AppointmentService {
       appointmentEndingTime.toDate(),
     );
 
+    // Creating a new instance of CreateAppointmentDto.
+    const createAppointmentDtoClone = new CreateAppointmentDto(
+      createAppointmentDto.doctorId,
+      createAppointmentDto.patientName,
+      dateOfAppointmentAfterTimezoneConversion,
+      appointmentStartingTime.format('HH:mm'),
+      createAppointmentDto.appointmentDuration,
+      createAppointmentDto.notes,
+      createAppointmentDto.timeZone,
+    );
+
     if (conflictingAppointments?.length) throw new ValidationException('Your appointment with the doctor is conflicting with other appointments.');
-    return this._appointmentRepository.create(createAppointmentDto);
+    return this._appointmentRepository.create(createAppointmentDtoClone);
   }
 
   async findAll(filter: LooseObject = {}): Promise<FireBaseAppointmentInfo[]> {

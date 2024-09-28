@@ -9,3 +9,8 @@ export interface SlotInformation {
 export interface FireBaseAppointmentInfo extends Appointment {
   id: string;
 }
+
+export enum TimeZones {
+  ASIA = 'Asia/Kolkata',
+  LOS_ANGELES = 'America/Los_Angeles',
+}

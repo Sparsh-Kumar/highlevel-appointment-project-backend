@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { AppointmentJoiInterface } from '../../database/types';
 import ValidationException from '../../exceptions/validation-exception-handler';
+import { TimeZones } from '../types';
 
 export default class CreateAppointmentDto {
   public readonly doctorId: string;
@@ -13,6 +14,8 @@ export default class CreateAppointmentDto {
 
   public readonly appointmentDuration: number;
 
+  public readonly timeZone: string;
+
   public readonly notes: string;
 
   constructor(
@@ -22,6 +25,7 @@ export default class CreateAppointmentDto {
     appointmentStartTime: string,
     appointmentDuration: number,
     notes: string,
+    timeZone: string,
   ) {
     this.doctorId = doctorId;
     this.patientName = patientName;
@@ -29,6 +33,7 @@ export default class CreateAppointmentDto {
     this.appointmentStartTime = appointmentStartTime;
     this.appointmentDuration = appointmentDuration;
     this.notes = notes;
+    this.timeZone = timeZone;
   }
 
   static from(reqBody: Partial<AppointmentJoiInterface>): CreateAppointmentDto | never {
@@ -51,6 +56,13 @@ export default class CreateAppointmentDto {
         .max(500)
         .optional()
         .default(''),
+      timeZone: Joi.string()
+        .valid(
+          TimeZones.ASIA,
+          TimeZones.LOS_ANGELES,
+        )
+        .default(TimeZones.ASIA)
+        .required(),
     });
 
     const {
@@ -71,6 +83,7 @@ export default class CreateAppointmentDto {
       value.appointmentStartTime,
       value.appointmentDuration,
       value.notes,
+      value.timeZone,
     );
   }
 }

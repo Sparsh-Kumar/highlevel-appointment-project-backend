@@ -25,4 +25,5 @@ export interface AppointmentJoiInterface {
   appointmentDate: string;
   appointmentStartTime: string;
   appointmentDuration: number;
+  timeZone: string;
 }
