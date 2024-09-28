@@ -64,8 +64,8 @@ export default class AppointmentService {
   }
 
   async freeSlots(getFreeSlotsDto: GetFreeSlotsDto): Promise<SlotInformation[]> {
-    const doctorDayStart = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
-    const doctorDayEnd = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
+    const doctorDayStart = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm').utc();
+    const doctorDayEnd = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm').utc();
     let tempStartDate = doctorDayStart.clone();
     const intervalMinutes = 30;
     const defaultAvailableSlots: SlotInformation[] = [];
@@ -88,14 +88,14 @@ export default class AppointmentService {
       getAllAppointmentsDto,
     );
     availableAppointments.sort(
-      (a, b) => moment(a.appointmentStartTime).diff(moment(b.appointmentStartTime)),
+      (a, b) => moment.utc(a.appointmentStartTime).diff(moment.utc(b.appointmentStartTime)),
     );
     let slots: SlotInformation[] = defaultAvailableSlots.filter((slot: SlotInformation) => {
       let shouldExcluded = false;
       for (let i = 0; i < availableAppointments?.length; i += 1) {
         const record = availableAppointments[i];
-        const appointmentStart = moment(record.appointmentStartTime);
-        const appointmentEnd = moment(record.appointmentEndTime);
+        const appointmentStart = moment(record.appointmentStartTime).utc();
+        const appointmentEnd = moment(record.appointmentEndTime).utc();
         if (
           (
             appointmentStart.isAfter(slot.slotStartingTime)
