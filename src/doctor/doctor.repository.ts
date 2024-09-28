@@ -17,6 +17,7 @@ import { Doctor } from '../database/types';
 import { LooseObject } from '../helpers/types';
 import DbService from '../database/db.service';
 import CreateDoctorDto from './dtos/create-doctor.dto';
+import { FireBaseDoctorInfo } from './types';
 
 @injectable()
 export default class DoctorRepository {
@@ -24,8 +25,8 @@ export default class DoctorRepository {
 
   async findAll(
     filter: LooseObject = {},
-  ): Promise<Doctor[]> {
-    const doctors: Doctor[] = [];
+  ): Promise<FireBaseDoctorInfo[]> {
+    const doctors: FireBaseDoctorInfo[] = [];
     const conditions: QueryFieldFilterConstraint[] = [];
     if (filter?.name) {
       conditions.push(where('name', '==', filter?.name));
@@ -37,7 +38,10 @@ export default class DoctorRepository {
       query(this._dbContext.doctors, ...conditions),
     );
     docSnap.forEach((document: QueryDocumentSnapshot<Doctor, DocumentData>) => {
-      doctors.push(document.data());
+      doctors.push({
+        id: document.id,
+        ...document.data()
+      });
     });
     return doctors;
   }

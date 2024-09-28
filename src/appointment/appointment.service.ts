@@ -7,7 +7,7 @@ import CreateAppointmentDto from './dtos/create-appointment.dto';
 import DoctorService from '../doctor/doctor.service';
 import NotFoundException from '../exceptions/not-found-exception-handler';
 import ValidationException from '../exceptions/validation-exception-handler';
-import { SlotInformation } from './types';
+import { FireBaseAppointmentInfo, SlotInformation } from './types';
 
 @injectable()
 export default class AppointmentService {
@@ -38,7 +38,7 @@ export default class AppointmentService {
     return this._appointmentRepository.create(createAppointmentDto);
   }
 
-  async findAll(filter: LooseObject = {}): Promise<Appointment[]> {
+  async findAll(filter: LooseObject = {}): Promise<FireBaseAppointmentInfo[]> {
     const appointmentStartDate = <string>(filter?.appointmentStartDate);
     const appointmentEndDate = <string>(filter?.appointmentEndDate);
     if (appointmentStartDate && appointmentEndDate && (moment(appointmentEndDate).isBefore(moment(appointmentStartDate)))) throw new ValidationException('Appointment end date should be more than start date.');

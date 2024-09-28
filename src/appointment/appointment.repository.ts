@@ -17,6 +17,7 @@ import { LooseObject } from 'src/helpers/types';
 import DbService from '../database/db.service';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
 import { Appointment } from '../database/types';
+import { FireBaseAppointmentInfo } from './types';
 
 @injectable()
 export default class AppointmentRepository {
@@ -132,8 +133,8 @@ export default class AppointmentRepository {
 
   async findAll(
     filter: LooseObject = {},
-  ): Promise<Appointment[]> {
-    const appointments: Appointment[] = [];
+  ): Promise<FireBaseAppointmentInfo[]> {
+    const appointments: FireBaseAppointmentInfo[] = [];
     const conditions: QueryFieldFilterConstraint[] = [];
     if (filter?.appointmentStartDate && typeof filter?.appointmentStartDate === 'string') {
       conditions.push(where('appointmentDate', '>=', new Date(filter?.appointmentStartDate)));
@@ -145,7 +146,10 @@ export default class AppointmentRepository {
       query(this._dbContext.appointments, ...conditions),
     );
     docSnap.forEach((document: QueryDocumentSnapshot<Appointment, DocumentData>) => {
-      appointments.push(document.data());
+      appointments.push({
+        id: document.id,
+        ...document.data()
+      });
     });
     appointments.forEach((record: LooseObject) => {
       /* eslint-disable no-param-reassign */
