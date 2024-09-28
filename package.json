@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:md": "remark .",
     "lint:fix": "eslint --fix .",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "build": "npx tsc"
   },
   "author": "sparshkumar",
   "license": "MIT",
