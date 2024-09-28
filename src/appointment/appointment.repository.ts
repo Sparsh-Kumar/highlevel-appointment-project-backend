@@ -18,6 +18,7 @@ import DbService from '../database/db.service';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
 import { Appointment } from '../database/types';
 import { FireBaseAppointmentInfo } from './types';
+import GetAllAppointmentsDto from './dtos/get-all-appointment.dto';
 
 @injectable()
 export default class AppointmentRepository {
@@ -132,15 +133,18 @@ export default class AppointmentRepository {
   }
 
   async findAll(
-    filter: LooseObject = {},
+    getAllAppointmentsDto: GetAllAppointmentsDto,
   ): Promise<FireBaseAppointmentInfo[]> {
     const appointments: FireBaseAppointmentInfo[] = [];
     const conditions: QueryFieldFilterConstraint[] = [];
-    if (filter?.appointmentStartDate && typeof filter?.appointmentStartDate === 'string') {
-      conditions.push(where('appointmentDate', '>=', new Date(filter?.appointmentStartDate)));
+    if (getAllAppointmentsDto?.startDate && typeof getAllAppointmentsDto?.startDate === 'string') {
+      conditions.push(where('appointmentDate', '>=', new Date(getAllAppointmentsDto?.startDate)));
     }
-    if (filter?.appointmentEndDate && typeof filter?.appointmentEndDate === 'string') {
-      conditions.push(where('appointmentDate', '<=', new Date(filter?.appointmentEndDate)));
+    if (getAllAppointmentsDto?.endDate && typeof getAllAppointmentsDto?.endDate === 'string') {
+      conditions.push(where('appointmentDate', '<=', new Date(getAllAppointmentsDto?.endDate)));
+    }
+    if (getAllAppointmentsDto?.doctorId && typeof getAllAppointmentsDto?.doctorId === 'string') {
+      conditions.push(where('doctorId', '==', getAllAppointmentsDto.doctorId));
     }
     const docSnap: QuerySnapshot<Appointment, DocumentData> = await getDocs(
       query(this._dbContext.appointments, ...conditions),
@@ -153,9 +157,15 @@ export default class AppointmentRepository {
     });
     appointments.forEach((record: LooseObject) => {
       /* eslint-disable no-param-reassign */
-      record.appointmentDate = moment.unix(<number>record.appointmentDate.seconds).format('YYYY-MM-DD');
-      record.appointmentStartTime = moment.unix(<number>record.appointmentStartTime.seconds).format('YYYY-MM-DD HH:mm');
-      record.appointmentEndTime = moment.unix(<number>record.appointmentEndTime.seconds).format('YYYY-MM-DD HH:mm');
+      record.appointmentDate = moment.unix(<number>record.appointmentDate.seconds)
+        .tz(getAllAppointmentsDto.timeZone)
+        .format('YYYY-MM-DD');
+      record.appointmentStartTime = moment.unix(<number>record.appointmentStartTime.seconds)
+        .tz(getAllAppointmentsDto.timeZone)
+        .format('YYYY-MM-DD HH:mm');
+      record.appointmentEndTime = moment.unix(<number>record.appointmentEndTime.seconds)
+        .tz(getAllAppointmentsDto.timeZone)
+        .format('YYYY-MM-DD HH:mm');
     });
     return appointments;
   }

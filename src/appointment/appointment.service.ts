@@ -1,7 +1,5 @@
 import moment from 'moment';
-import * as mz from 'moment-timezone';
 import { injectable } from 'inversify';
-import { LooseObject } from '../helpers/types';
 import { Appointment } from '../database/types';
 import AppointmentRepository from './appointment.repository';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
@@ -9,6 +7,9 @@ import DoctorService from '../doctor/doctor.service';
 import NotFoundException from '../exceptions/not-found-exception-handler';
 import ValidationException from '../exceptions/validation-exception-handler';
 import { FireBaseAppointmentInfo, SlotInformation } from './types';
+import GetAllAppointmentsDto from './dtos/get-all-appointment.dto';
+import convertIntoApplicationTimeZone from '../helpers/timezone-helper';
+import GetFreeSlotsDto from './dtos/get-slots.dto';
 
 @injectable()
 export default class AppointmentService {
@@ -24,14 +25,9 @@ export default class AppointmentService {
     // Getting the appointmentStartingTime & appointmentEndingTime
     // according to timeZone provided in request body.
     const appointmentStartingFormatted = `${createAppointmentDto.appointmentDate} ${createAppointmentDto.appointmentStartTime}`;
-    const appointmentStartingTimeAcqToTz = mz.tz(
+    const convertedStartingTimeAcqToAppTz = convertIntoApplicationTimeZone(
       appointmentStartingFormatted,
       createAppointmentDto.timeZone,
-    );
-
-    // Now converting the time into the APPLICATION_TIMEZONE
-    const convertedStartingTimeAcqToAppTz = appointmentStartingTimeAcqToTz.clone().tz(
-      process.env.APPLICATION_TIMEZONE,
     );
     const appointmentStartingTime = moment(convertedStartingTimeAcqToAppTz, 'YYYY-MM-DD HH:mm');
     const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
@@ -62,17 +58,16 @@ export default class AppointmentService {
     return this._appointmentRepository.create(createAppointmentDtoClone);
   }
 
-  async findAll(filter: LooseObject = {}): Promise<FireBaseAppointmentInfo[]> {
-    const appointmentStartDate = <string>(filter?.appointmentStartDate);
-    const appointmentEndDate = <string>(filter?.appointmentEndDate);
-    if (appointmentStartDate && appointmentEndDate && (moment(appointmentEndDate).isBefore(moment(appointmentStartDate)))) throw new ValidationException('Appointment end date should be more than start date.');
-    return this._appointmentRepository.findAll(filter);
+  async findAll(getAllAppointmentsDto: GetAllAppointmentsDto): Promise<FireBaseAppointmentInfo[]> {
+    if (getAllAppointmentsDto.startDate && getAllAppointmentsDto.endDate && (moment(getAllAppointmentsDto.endDate).isBefore(moment(getAllAppointmentsDto.startDate)))) throw new ValidationException('Appointment end date should be more than start date.');
+    return this._appointmentRepository.findAll(getAllAppointmentsDto);
   }
 
-  async freeSlots(date: string, intervalMinutes = 30): Promise<SlotInformation[]> {
-    const doctorDayStart = moment(`${date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
-    const doctorDayEnd = moment(`${date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
+  async freeSlots(getFreeSlotsDto: GetFreeSlotsDto): Promise<SlotInformation[]> {
+    const doctorDayStart = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
+    const doctorDayEnd = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
     let tempStartDate = doctorDayStart.clone();
+    const intervalMinutes = 30;
     const defaultAvailableSlots: SlotInformation[] = [];
     while (tempStartDate < doctorDayEnd) {
       const slotStartingTime = tempStartDate.clone();
@@ -83,10 +78,15 @@ export default class AppointmentService {
       });
       tempStartDate = slotEndingTime;
     }
-    const availableAppointments: Appointment[] = await this.findAll({
-      appointmentStartDate: date,
-      appointmentEndDate: date,
-    });
+    const getAllAppointmentsDto = new GetAllAppointmentsDto(
+      getFreeSlotsDto.date,
+      getFreeSlotsDto.date,
+      getFreeSlotsDto.doctorId,
+      getFreeSlotsDto.timeZone,
+    );
+    const availableAppointments: FireBaseAppointmentInfo[] = await this.findAll(
+      getAllAppointmentsDto,
+    );
     availableAppointments.sort(
       (a, b) => moment(a.appointmentStartTime).diff(moment(b.appointmentStartTime)),
     );
@@ -114,8 +114,8 @@ export default class AppointmentService {
       return !shouldExcluded;
     });
     slots = slots.map((slot) => ({
-      slotStartingTime: moment(slot.slotStartingTime).format('YYYY-MM-DD HH:mm'),
-      slotEndingTime: moment(slot.slotEndingTime).format('YYYY-MM-DD HH:mm'),
+      slotStartingTime: moment(slot.slotStartingTime).tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
+      slotEndingTime: moment(slot.slotEndingTime).tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
     }));
     return slots;
   }

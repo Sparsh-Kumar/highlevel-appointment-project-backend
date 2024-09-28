@@ -14,3 +14,16 @@ export enum TimeZones {
   ASIA = 'Asia/Kolkata',
   LOS_ANGELES = 'America/Los_Angeles',
 }
+
+export interface GetAllAppointments {
+  startDate: string;
+  endDate: string;
+  doctorId: string;
+  timeZone: TimeZones;
+}
+
+export interface GetFreeSlots {
+  doctorId: string;
+  date: string;
+  timeZone: TimeZones;
+}
