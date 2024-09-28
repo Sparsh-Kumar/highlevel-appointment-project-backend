@@ -13,7 +13,7 @@
     "start": "node dist/server.js"
   },
   "author": "sparshkumar",
-  "license": "ISC",
+  "license": "MIT",
   "husky": {
     "hooks": {
       "pre-commit": "npm run pre-commit"
