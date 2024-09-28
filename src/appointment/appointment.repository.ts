@@ -116,7 +116,7 @@ export default class AppointmentRepository {
   }
 
   async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointment | null> {
-    const appointmentStartingTime = moment(`${createAppointmentDto.appointmentDate} ${createAppointmentDto.appointmentStartTime}`, 'YYYY-MM-DD HH:mm');
+    const appointmentStartingTime = moment.tz(`${createAppointmentDto.appointmentDate} ${createAppointmentDto.appointmentStartTime}`, process.env.APPLICATION_TIMEZONE);
     const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
     const appointmentData = {
       doctorId: createAppointmentDto.doctorId,
