@@ -4,7 +4,8 @@
   "description": "Application for creating and getting appointments.",
   "main": "index.js",
   "scripts": {
-    "devstart": "ts-node-dev --respawn --transpile-only --no-notify -r tsconfig-paths/register src/bootstrap.ts",
+    "start:dev": "ts-node-dev --respawn --transpile-only --no-notify -r tsconfig-paths/register src/bootstrap.ts",
+    "start:prod": "node ./dist/src/bootstrap.js",
     "test": "mocha --exit -r ts-node/register --project tsconfig.json test/**/*.spec.ts",
     "pre-commit": "npm run lint:fix && npm run lint",
     "lint": "eslint .",
