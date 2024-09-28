@@ -94,8 +94,14 @@ export default class AppointmentService {
       let shouldExcluded = false;
       for (let i = 0; i < availableAppointments?.length; i += 1) {
         const record = availableAppointments[i];
-        const appointmentStart = moment(record.appointmentStartTime);
-        const appointmentEnd = moment(record.appointmentEndTime);
+        const appointmentStart = moment.tz(
+          record.appointmentStartTime,
+          process.env.APPLICATION_TIMEZONE
+        );
+        const appointmentEnd = moment.tz(
+          record.appointmentEndTime,
+          process.env.APPLICATION_TIMEZONE
+        );
         if (
           (
             appointmentStart.isAfter(slot.slotStartingTime)
