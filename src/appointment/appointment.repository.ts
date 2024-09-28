@@ -13,7 +13,7 @@ import {
   getDoc,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
-import { LooseObject } from 'src/helpers/types';
+import { LooseObject } from '../helpers/types';
 import DbService from '../database/db.service';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
 import { Appointment } from '../database/types';

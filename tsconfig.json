@@ -22,7 +22,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "outDir": "./dist"
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": []

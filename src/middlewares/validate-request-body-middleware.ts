@@ -4,7 +4,7 @@ import {
   Response,
   NextFunction,
 } from 'express';
-import { DtoClass } from 'src/helpers/types';
+import { DtoClass } from '../helpers/types';
 import { LooseObject } from '../helpers/types';
 import BaseMiddleware from '../helpers/base-middleware';
 

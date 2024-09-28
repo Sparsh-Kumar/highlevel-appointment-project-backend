@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { injectable } from 'inversify';
-import { LooseObject } from 'src/helpers/types';
+import { LooseObject } from '../helpers/types';
 import { Appointment } from '../database/types';
 import AppointmentRepository from './appointment.repository';
 import CreateAppointmentDto from './dtos/create-appointment.dto';
