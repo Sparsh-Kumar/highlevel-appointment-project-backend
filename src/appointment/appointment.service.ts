@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import { injectable } from 'inversify';
 import { Appointment } from '../database/types';
 import AppointmentRepository from './appointment.repository';
@@ -32,8 +32,8 @@ export default class AppointmentService {
     const appointmentStartingTime = moment(convertedStartingTimeAcqToAppTz, 'YYYY-MM-DD HH:mm');
     const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
     const dateOfAppointmentAfterTimezoneConversion = appointmentStartingTime.format('YYYY-MM-DD');
-    const doctorDayStart = moment(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm', process.env.APPLICATION_TIMEZONE);
-    const doctorDayEnd = moment(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm', process.env.APPLICATION_TIMEZONE);
+    const doctorDayStart = moment.tz(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_START_TIMING}`, process.env.APPLICATION_TIMEZONE);
+    const doctorDayEnd = moment.tz(`${dateOfAppointmentAfterTimezoneConversion} ${process.env.APPOINTMENT_END_TIMING}`, process.env.APPLICATION_TIMEZONE);
 
     if (appointmentStartingTime.isBefore(doctorDayStart) || appointmentEndingTime.isAfter(doctorDayEnd)) throw new ValidationException('The appointment should be set in the availability time of the doctor.');
 
@@ -64,8 +64,8 @@ export default class AppointmentService {
   }
 
   async freeSlots(getFreeSlotsDto: GetFreeSlotsDto): Promise<SlotInformation[]> {
-    const doctorDayStart = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, 'YYYY-MM-DD HH:mm');
-    const doctorDayEnd = moment(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, 'YYYY-MM-DD HH:mm');
+    const doctorDayStart = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, process.env.APPLICATION_TIMEZONE);
+    const doctorDayEnd = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, process.env.APPLICATION_TIMEZONE);
     let tempStartDate = doctorDayStart.clone();
     const intervalMinutes = 30;
     const defaultAvailableSlots: SlotInformation[] = [];
@@ -114,8 +114,8 @@ export default class AppointmentService {
       return !shouldExcluded;
     });
     slots = slots.map((slot) => ({
-      slotStartingTime: moment(slot.slotStartingTime).tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
-      slotEndingTime: moment(slot.slotEndingTime).tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
+      slotStartingTime: (slot.slotStartingTime as Moment).clone().tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
+      slotEndingTime: (slot.slotEndingTime as Moment).clone().tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
     }));
     return slots;
   }
