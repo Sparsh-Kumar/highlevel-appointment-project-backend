@@ -4,8 +4,8 @@ import {
   Response,
   NextFunction,
 } from 'express';
-import { DtoClass } from '../helpers/types';
-import { LooseObject } from '../helpers/types';
+import { DtoClass, LooseObject } from '../helpers/types';
+
 import BaseMiddleware from '../helpers/base-middleware';
 
 export default class ValidateRequestMiddleware extends BaseMiddleware {
