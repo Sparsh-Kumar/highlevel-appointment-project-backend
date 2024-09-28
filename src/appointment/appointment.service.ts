@@ -64,7 +64,6 @@ export default class AppointmentService {
   }
 
   async freeSlots(getFreeSlotsDto: GetFreeSlotsDto): Promise<SlotInformation[]> {
-
     // Doctor Start Time & End Time in IST.
     const doctorDayStartIST = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, process.env.APPLICATION_TIMEZONE);
     const doctorDayEndIST = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, process.env.APPLICATION_TIMEZONE);
