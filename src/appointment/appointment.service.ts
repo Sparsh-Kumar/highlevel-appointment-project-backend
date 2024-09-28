@@ -31,7 +31,7 @@ export default class AppointmentService {
 
     // Now converting the time into the APPLICATION_TIMEZONE
     const convertedStartingTimeAcqToAppTz = appointmentStartingTimeAcqToTz.clone().tz(
-      process.env.APPLICATION_TIMEZONE
+      process.env.APPLICATION_TIMEZONE,
     );
     const appointmentStartingTime = moment(convertedStartingTimeAcqToAppTz, 'YYYY-MM-DD HH:mm');
     const appointmentEndingTime = appointmentStartingTime.clone().add(createAppointmentDto.appointmentDuration, 'minutes');
