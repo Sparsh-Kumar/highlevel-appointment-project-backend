@@ -148,7 +148,7 @@ export default class AppointmentRepository {
     docSnap.forEach((document: QueryDocumentSnapshot<Appointment, DocumentData>) => {
       appointments.push({
         id: document.id,
-        ...document.data()
+        ...document.data(),
       });
     });
     appointments.forEach((record: LooseObject) => {

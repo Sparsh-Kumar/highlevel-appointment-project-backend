@@ -40,7 +40,7 @@ export default class DoctorRepository {
     docSnap.forEach((document: QueryDocumentSnapshot<Doctor, DocumentData>) => {
       doctors.push({
         id: document.id,
-        ...document.data()
+        ...document.data(),
       });
     });
     return doctors;

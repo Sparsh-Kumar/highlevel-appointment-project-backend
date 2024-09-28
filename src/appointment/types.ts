@@ -1,5 +1,5 @@
 import { Moment } from 'moment';
-import { Appointment } from "../database/types";
+import { Appointment } from '../database/types';
 
 export interface SlotInformation {
   slotStartingTime: string | Moment;
@@ -8,5 +8,4 @@ export interface SlotInformation {
 
 export interface FireBaseAppointmentInfo extends Appointment {
   id: string;
-};
-
+}
