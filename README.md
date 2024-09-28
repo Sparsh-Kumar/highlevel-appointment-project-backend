@@ -243,8 +243,8 @@ To get started with project, you can follow these steps:
                 "slotEndingTime": "2024-09-28 17:00"
             }
         ],
-     "error": null,
-     "statusCode": 200
+       "error": null,
+       "statusCode": 200
    }
    ```
 
