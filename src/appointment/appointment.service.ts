@@ -96,11 +96,11 @@ export default class AppointmentService {
         const record = availableAppointments[i];
         const appointmentStart = moment.tz(
           record.appointmentStartTime,
-          process.env.APPLICATION_TIMEZONE
+          process.env.APPLICATION_TIMEZONE,
         );
         const appointmentEnd = moment.tz(
           record.appointmentEndTime,
-          process.env.APPLICATION_TIMEZONE
+          process.env.APPLICATION_TIMEZONE,
         );
         if (
           (
