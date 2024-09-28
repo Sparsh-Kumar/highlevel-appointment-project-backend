@@ -64,14 +64,8 @@ export default class AppointmentService {
   }
 
   async freeSlots(getFreeSlotsDto: GetFreeSlotsDto): Promise<SlotInformation[]> {
-    // Doctor Start Time & End Time in IST.
-    const doctorDayStartIST = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, process.env.APPLICATION_TIMEZONE);
-    const doctorDayEndIST = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, process.env.APPLICATION_TIMEZONE);
-
-    // Doctor Start Time & End Time in specified Timezone
-    const doctorDayStart = doctorDayStartIST.clone().tz(getFreeSlotsDto.timeZone);
-    const doctorDayEnd = doctorDayEndIST.clone().tz(getFreeSlotsDto.timeZone);
-
+    const doctorDayStart = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_START_TIMING}`, process.env.APPLICATION_TIMEZONE);
+    const doctorDayEnd = moment.tz(`${getFreeSlotsDto.date} ${process.env.APPOINTMENT_END_TIMING}`, process.env.APPLICATION_TIMEZONE);
     let tempStartDate = doctorDayStart.clone();
     const intervalMinutes = 30;
     const defaultAvailableSlots: SlotInformation[] = [];
@@ -120,8 +114,8 @@ export default class AppointmentService {
       return !shouldExcluded;
     });
     slots = slots.map((slot) => ({
-      slotStartingTime: (slot.slotStartingTime as Moment).format('YYYY-MM-DD HH:mm'),
-      slotEndingTime: (slot.slotEndingTime as Moment).format('YYYY-MM-DD HH:mm'),
+      slotStartingTime: (slot.slotStartingTime as Moment).clone().tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
+      slotEndingTime: (slot.slotEndingTime as Moment).clone().tz(getFreeSlotsDto.timeZone).format('YYYY-MM-DD HH:mm'),
     }));
     return slots;
   }
